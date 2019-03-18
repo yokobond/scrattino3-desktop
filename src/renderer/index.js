@@ -1,11 +1,18 @@
 import {ipcRenderer, shell} from 'electron';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import GUI, {AppStateHOC} from 'scratch-gui';
+import GUI, {AppStateHOC, guiInitialState} from 'scratch-gui';
 
 import ElectronStorageHelper from '../common/ElectronStorageHelper';
 
 import styles from './app.css';
+
+
+guiInitialState.vm.extensionManager.loadExtensionURL('./extensions/utilities/index.js');
+
+// Hold Scratch VM to manipulate by outer scripts.
+if (!global.Scratch) global.Scratch = {};
+global.Scratch.vm = guiInitialState.vm;
 
 const defaultProjectId = 0;
 

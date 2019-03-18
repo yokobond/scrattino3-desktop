@@ -35,7 +35,7 @@ const makeConfig = function (options) {
     }
 
     return {
-        devtool: 'cheap-module-eval-source-map',
+        devtool: 'source-map',
         mode: isProduction ? 'production' : 'development',
         module: {
             rules: [
@@ -84,7 +84,11 @@ const makeConfig = function (options) {
         resolve: {
             cacheWithContext: false,
             symlinks: false
-        }
+        },
+        externals: [
+            {
+                serialport: 'serialport'
+            }]
     };
 };
 

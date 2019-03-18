@@ -12,6 +12,7 @@
     "fetch": "rimraf ./static/assets/ && mkdirp ./static/assets/ && node ./scripts/fetchMediaLibraryAssets.js",
     "dist": "npm run fetch && npm run compile -p && electron-builder",
     "dist:dir": "npm run dist -- --dir -c.compression=store -c.mac.identity=null",
+    "postinstall": "electron-builder install-app-deps",
     "lint": "eslint --cache --color --ext .jsx,.js ."
   },
   "repository": {
@@ -19,6 +20,7 @@
     "url": "git+ssh://git@github.com/LLK/scratch-desktop.git"
   },
   "dependencies": {
+    "serialport": "^7.1.4",
     "source-map-support": "^0.5.9"
   },
   "devDependencies": {
@@ -36,13 +38,16 @@
     "electron": "^4.0.1",
     "electron-builder": "^20.38.4",
     "electron-devtools-installer": "^2.2.4",
+    "electron-log": "^3.0.1",
     "electron-store": "^2.0.0",
     "electron-webpack": "^2.6.1",
     "eslint": "^5.12.0",
     "eslint-config-scratch": "^5.0.0",
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-react": "^7.12.3",
+    "firmata-io": "^2.0.0",
     "intl": "1.2.5",
+    "json-rpc-ws": "^7.0.1",
     "mkdirp": "^0.5.1",
     "nets": "^3.2.0",
     "react": "16.2.0",

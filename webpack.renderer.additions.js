@@ -14,6 +14,16 @@ module.exports = makeConfig({
         new CopyWebpackPlugin([{
             from: path.resolve(__dirname, 'node_modules', 'scratch-gui', 'dist', 'static'),
             to: 'static'
+        }]),
+        new CopyWebpackPlugin([{
+            from: 'extension-worker.{js,js.map}',
+            to: 'static',
+            context: path.resolve(__dirname, 'node_modules', 'scratch-gui', 'dist')
+        }]),
+        new CopyWebpackPlugin([{
+            from: 'extensions/**',
+            to: 'static',
+            context: path.resolve(__dirname, 'static')
         }])
     ]
 });
