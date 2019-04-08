@@ -239,8 +239,8 @@ class FirmataRPC {
 
     getBoardStateOn (portPath) {
         const board = this.connectedBoards[portPath];
-        if (!board) return null;
         const boardState = {};
+        if (!board) return boardState;
         boardState.MODES = board.MODES;
         boardState.pins = board.pins;
         boardState.analogPins = board.analogPins;
