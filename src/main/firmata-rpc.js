@@ -94,6 +94,14 @@ class FirmataRPC {
                 reply(e, params);
             }
         });
+        this.rpcServer.expose('servoWrite', (params, reply) => {
+            try {
+                this.servoWrite(params.portPath, params.pin, params.value);
+                reply(null, params);
+            } catch (e) {
+                reply(e, params);
+            }
+        });
     }
 
     startServer () {
@@ -287,6 +295,13 @@ class FirmataRPC {
         if (!board) throw new Error(`Board not found on ${portPath}`);
         board.pinMode(pin, mode);
         log.debug(`pinMode(${pin}, ${mode})`);
+    }
+
+    servoWrite (portPath, pin, value) {
+        const board = this.connectedBoards[portPath];
+        if (!board) throw new Error(`Board not found on ${portPath}`);
+        board.servoWrite(pin, value);
+        log.debug(`servoWrite(${pin}, ${value})`);
     }
 }
 
