@@ -8,8 +8,6 @@ import ElectronStorageHelper from '../common/ElectronStorageHelper';
 import styles from './app.css';
 
 
-guiInitialState.vm.extensionManager.loadExtensionURL('./extensions/utilities/index.js');
-
 // Hold Scratch VM to manipulate by outer scripts.
 if (!global.Scratch) global.Scratch = {};
 global.Scratch.vm = guiInitialState.vm;
