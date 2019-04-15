@@ -217,8 +217,13 @@ class FirmataRPC {
     }
 
     _initializeBoard (board) {
-        for (let i = 0; i < board.analogPins.length; i++) {
-            board.reportAnalogPin(i, 1);
+        for (let i = 0; i < board.pins.length; i++) {
+            const ain = board.analogPins.indexOf(i);
+            if (ain >= 0) {
+                board.reportAnalogPin(ain, 1);
+            } else {
+                board.reportDigitalPin(i, 1);
+            }
         }
     }
 
