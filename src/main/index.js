@@ -5,13 +5,33 @@ import {getFilterForExtension} from './FileFilters';
 import telemetry from './ScratchDesktopTelemetry';
 import MacOSMenu from './MacOSMenu';
 
+const log = require('electron-log');
+
 telemetry.appWasOpened();
 
+const FirmataRPC = require('./firmata-rpc');
+const firmataServer = new FirmataRPC();
+
+const startRpcServer = () => {
+    firmataServer.startServer()
+        .then(() => {
+            if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
+                firmataServer.listBoards()
+                    .then(boards => {
+                        log.debug(boards);
+                    });
+            }
+        })
+        .catch(reason => {
+            log.error(reason);
+        });
+};
 
 // const defaultSize = {width: 1096, height: 715}; // minimum
 const defaultSize = {width: 1280, height: 800}; // good for MAS screenshots
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
+
 
 const createMainWindow = () => {
     const window = new BrowserWindow({
@@ -28,14 +48,25 @@ const createMainWindow = () => {
     }
 
     if (isDevelopment) {
-        webContents.openDevTools();
-        import('electron-devtools-installer').then(importedModule => {
-            const {default: installExtension, REACT_DEVELOPER_TOOLS} = importedModule;
-            installExtension(REACT_DEVELOPER_TOOLS);
-            // TODO: add logging package and bring back the lines below
-            // .then(name => console.log(`Added browser extension:  ${name}`))
-            // .catch(err => console.log('An error occurred: ', err));
-        });
+        const {default: installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} = require('electron-devtools-installer');
+        const installExtensions = async () => {
+            const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
+            const extensions = [];
+            if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
+                extensions.push(REACT_DEVELOPER_TOOLS);
+                extensions.push(REDUX_DEVTOOLS);
+            }
+            return Promise
+                .all(extensions.map(name => installExtension(name, forceDownload)))
+                .catch(log.error);
+        };
+        installExtensions().then(() => webContents.openDevTools());
+        // import('electron-devtools-installer').then(importedModule => {
+        //     const {default: installExtension, REACT_DEVELOPER_TOOLS} = importedModule;
+        //     installExtension(REACT_DEVELOPER_TOOLS)
+        //         .then(name => log.log(`Added browser extension:  ${name}`))
+        //         .catch(err => log.log('An error occurred: ', err));
+        // });
     }
 
     webContents.on('devtools-opened', () => {
@@ -47,6 +78,7 @@ const createMainWindow = () => {
 
     if (isDevelopment) {
         window.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`);
+        // window.loadURL(`file://${__dirname}/../../dist/renderer/index.html`);
     } else {
         window.loadURL(formatUrl({
             pathname: path.join(__dirname, 'index.html'),
@@ -104,11 +136,18 @@ app.on('will-quit', () => {
     telemetry.appWillClose();
 });
 
+app.on('before-quit', () => {
+    if (firmataServer) {
+        firmataServer.release();
+    }
+});
+
 // global reference to mainWindow (necessary to prevent window from being garbage collected)
 let _mainWindow;
 
 // create main BrowserWindow when electron is ready
 app.on('ready', () => {
+    startRpcServer();
     _mainWindow = createMainWindow();
     _mainWindow.on('closed', () => {
         _mainWindow = null;
