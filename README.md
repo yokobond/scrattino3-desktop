@@ -1,6 +1,6 @@
-# scratch-desktop
+# scrattino3-desktop
 
-Scratch 3.0 as a standalone desktop application
+Scrattino3 Desktop is a programming environment based on Scratch 3.0
 
 ## Developer Instructions
 
@@ -11,12 +11,14 @@ that repository's main development line. For now, though, there's a separate bra
 
 1. Clone the `scratch-gui` repository if you haven't already.
 2. Switch to the `scratch-desktop` branch with `git checkout scratch-desktop`
-3. Build with `BUILD_MODE=dist`:
-   - macOS, WSL, or Cygwin: run `BUILD_MODE=dist npm run build` or `BUILD_MODE=dist npm run watch`
-   - CMD: run `set BUILD_MODE=dist` once, then `npm run build` or `npm run watch` any number of times in the same
+3. Build with `BUILD_MODE=dist` and `STATIC_PATH=./static`:
+   - macOS, WSL, or Cygwin: run `BUILD_MODE=dist;STATIC_PATH=./static npm run build` or `BUILD_MODE=dist;STATIC_PATH=./static npm run watch`
+   - CMD: run `set BUILD_MODE=dist & STATIC_PATH=./static` once, then `npm run build` or `npm run watch` any number of times in the same
      window.
-   - PowerShell: run `$env:BUILD_MODE = "dist"` once, then `npm run build` or `npm run watch` any number of times in
+   - PowerShell: run `$env:BUILD_MODE = "dist"; $env:STATIC_PATH = "./static"` once, then `npm run build` or `npm run watch` any number of times in
      the same window.
+4. Link cloned scratch-gui by `npm link` in the cloned scratch-gui.
+5. Set scratch-desktop to use linked scratch-gui by 'npm link scratch-gui'. 
 
 ### Prepare media library assets
 
