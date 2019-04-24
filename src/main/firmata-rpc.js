@@ -26,6 +26,8 @@ class FirmataRPC {
 
         this.serverPort = 2020;
 
+        this.listTimeoutTime = 5000;
+
         // Start server sequence.
         this.rpcServer = new JsonRpcWs.createServer();
     }
@@ -194,26 +196,41 @@ class FirmataRPC {
 
     async listBoards () {
         const ports = await this.listPorts();
+        const boards = [];
         const boardScanners = ports.map(portMetaData => new Promise(resolve => {
             const portPath = portMetaData.comName;
             if (this.connectedBoards[portPath]) {
-                resolve(this.connectedBoards[portPath]);
+                boards.push(this.connectedBoards[portPath]);
+                resolve(portPath);
             }
-            this._openBoardOn(portPath)
+            let timeoutID;
+            const timeout = new Promise(() => {
+                timeoutID = setTimeout(() => {
+                    clearTimeout(timeoutID);
+                    log.debug(`timeout: ${portPath}`);
+                    resolve(portPath); // Resolve to do not stop Promise.all().
+                }, this.listTimeoutTime);
+            });
+            Promise.race([
+                this._openBoardOn(portPath),
+                timeout
+            ])
                 .then(board => {
+                    clearTimeout(timeoutID);
                     log.info(`Found Firmata on ${board.transport.path} : ${board.firmware.name}` +
                         ` v.${board.firmware.version.major}.${board.firmware.version.minor}`);
-                    // No more opened port after the board data ware retrieved.
-                    board.transport.close();
-                    resolve(board);
+                    board.transport.close(); // No need to open after got the board properties.
+                    boards.push(board);
+                    resolve(portPath);
                 })
-                .catch(() => {
-                    // Return null to be ignored when the port is not a Firmata board.
-                    resolve(null);
+                .catch(err => {
+                    clearTimeout(timeoutID);
+                    log.debug(err);
+                    resolve(portPath); // Resolve to do not stop Promise.all().
                 });
         }));
-        const boards = await Promise.all(boardScanners);
-        return boards.filter(board => board !== null);
+        await Promise.all(boardScanners);
+        return boards;
     }
 
     _initializeBoard (board) {
