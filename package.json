@@ -56,7 +56,7 @@
     "react-redux": "5.0.7",
     "redux": "3.7.2",
     "rimraf": "^2.6.3",
-    "scratch-gui": "github:yokobond/scratch-ext#extension/scrattino",
+    "scratch-gui": "github:yokobond/scratch-ext#scrattino-0.2.0",
     "source-map-loader": "^0.2.4",
     "uglifyjs-webpack-plugin": "^2.1.1",
     "uuid": "^3.3.2",
