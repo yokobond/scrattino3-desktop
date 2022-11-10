@@ -35,7 +35,7 @@
     "babel-loader": "^8.0.5",
     "babel-plugin-react-intl": "^2.3.1",
     "copy-webpack-plugin": "^4.6.0",
-    "electron": "^4.0.1",
+    "electron": "^18.3.7",
     "electron-builder": "^20.38.4",
     "electron-devtools-installer": "^2.2.4",
     "electron-log": "^3.0.1",
